@@ -1,0 +1,14 @@
+# How to
+On the server where you'll run the Traefik container, create a file named `acme.json` in the `config` directory as:
+
+```bash
+mkdir storage && touch storage/acme.json
+chmod 600 storage/acme.json
+```
+
+Additionally, create a docker network named `traefik_proxy` as:
+```bash
+docker network create traefik_proxy
+```
+
+After that, update the `.env` file as per the `.env.sample` after which you can run the `docker-compose up` command.

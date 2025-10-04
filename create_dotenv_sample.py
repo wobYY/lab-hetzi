@@ -13,9 +13,9 @@ def process_env_file(env_file_path):
     # Write the lines to the .env.sample file
     with open(sample_file, "w") as f:
         for line in lines:
-            if not line.startswith("#"):
+            if not line.startswith("#") and line.strip() != "":
                 # Replace everything past the = with "ENTER_YOUR_VALUE_HERE"
-                line = line.split("=", 1)[0].strip() + " = ENTER_YOUR_VALUE_HERE\n"
+                line = line.split("=", 1)[0].strip() + " = 'ENTER_YOUR_VALUE_HERE'\n"
             f.write(line)
 
 def find_and_process_env_files(start_path):

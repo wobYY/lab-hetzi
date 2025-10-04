@@ -1,0 +1,42 @@
+services:
+  traefik-external:
+    image: traefik:latest
+    container_name: traefik-external
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    networks:
+      - traefik_proxy
+    ports:
+      - "80:80" # The HTTP port
+      - "443:443" # The HTTPS port
+    environment:
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+      # - TZ="Europe/Zagreb" # If you don't want TZ to be UTC
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik.yaml:/traefik.yaml:ro
+      - ./storage/acme.json:/acme.json
+      - ./config/config.yaml:/config.yaml:ro
+      - ./storage/logs:/var/log/traefik
+    labels:
+      - "externalproxy=true"
+      - "traefik.enable=true"
+      # - "traefik.http.routers.traefik-ext.entrypoints=http"
+      # - "traefik.http.middlewares.traefik-ext-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # - "traefik.http.routers.traefik-ext.middlewares=traefik-https-redirect"
+      # - "traefik.http.routers.traefik-ext-secure.entrypoints=https"
+      # - "traefik.http.routers.traefik-ext-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-ext-secure.tls=true"
+      - "traefik.http.routers.traefik-ext-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-ext-secure.tls.domains[0].main=${TOP_LVL_DOMAIN}"
+      - "traefik.http.routers.traefik-ext-secure.tls.domains[0].sans=*.${TOP_LVL_DOMAIN}"
+      - "traefik.http.routers.traefik-ext-secure.service=api@internal"
+
+networks:
+  traefik_proxy:
+    external: true
